@@ -1,3 +1,6 @@
+import { Player } from "./player.js";
+import { Input } from "./input.js";
+
 export class Game {
     constructor(canvas) {
         this.canvas = canvas;
@@ -5,13 +8,23 @@ export class Game {
 
         this.running = false;
         this.lastTime = 0;
+
+        this.input = new Input();
+
+        this.player = new Player(
+            canvas.width / 2 - 20,
+            canvas.height / 2 - 20
+        );
     }
 
     start() {
         this.running = true;
 
         this.resizeCanvas();
-        window.addEventListener("resize", () => this.resizeCanvas());
+
+        window.addEventListener("resize", () => {
+            this.resizeCanvas();
+        });
 
         requestAnimationFrame((time) => this.gameLoop(time));
     }
@@ -24,7 +37,10 @@ export class Game {
     gameLoop(currentTime) {
         if (!this.running) return;
 
-        const deltaTime = (currentTime - this.lastTime) / 1000;
+        const deltaTime = this.lastTime === 0
+            ? 0
+            : (currentTime - this.lastTime) / 1000;
+
         this.lastTime = currentTime;
 
         this.update(deltaTime);
@@ -34,7 +50,11 @@ export class Game {
     }
 
     update(deltaTime) {
-        // Game logic will go here.
+        this.player.update(
+            deltaTime,
+            this.input,
+            this.canvas
+        );
     }
 
     draw() {
@@ -45,6 +65,6 @@ export class Game {
             this.canvas.height
         );
 
-        // Drawing will go here.
+        this.player.draw(this.ctx);
     }
 }
